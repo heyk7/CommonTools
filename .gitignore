@@ -11,6 +11,9 @@
 !Bandizip/*.exe
 !Bandizip/data/*.exe
 
+# 分卷压缩包目录（.z01 等分卷不受 *.zip 影响，但每组末尾的 .zip 需要放行）
+!archives/*.zip
+
 # Nacos 运行时数据、日志及超限 jar 包
 nacos/nacos/target/
 nacos/nacos/data/
