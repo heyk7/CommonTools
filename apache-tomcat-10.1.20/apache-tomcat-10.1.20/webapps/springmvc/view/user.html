@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/springmvc/css/bootstrap.min.css">
+    <script type="text/javascript" src="/springmvc/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+
+<div class="container py-5">
+
+    <form class="col-md-6 offset-md-3" method="post" action="/springmvc/users">
+
+        <input type="hidden" name="_method" value="put">
+
+        <p class="display-6 text-center mb-5">新增用户</p>
+
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="a">账号</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="a" name="id"/>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="b">昵称</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="b" name="username"/>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label" for="c">日期</label>
+            <div class="col-sm-10">
+                <input type="datetime-local" class="form-control" id="c" name="dateTime"/>
+            </div>
+        </div>
+<!--        提交按钮-->
+        <button type="submit" class="btn btn-primary w-100 rounded-0">提 交</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

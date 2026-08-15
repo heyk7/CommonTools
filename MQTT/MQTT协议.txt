@@ -1,0 +1,205 @@
+MQTT协议
+是一种基于发布/订阅模式的轻量级消息传输协议，设计用于低带宽、高延迟或不稳定的网络环境，广泛应用于物联网领域。
+
+应用场景：智能家居、车联网、工业物联网、远程监控和控制、消息通知、资源监控与管理、数据采集和分析
+
+协议优势：
+常见的计算机语言都支持MQTT协议的客户端
+MQTT协议是建立在TCP/IP协议基础之上，所以更安全和可靠
+服务质量设置，提供了三种质量分配： Qos 0：消息可能会丢失、Qos 1：消息不回丢失，但是可能会重复、Qos 2：消息不会丢失也不会重复
+
+心跳保护机制：由于网络问题，可能进入假死状态，为了判断客户端和代理是否出现异常
+
+持久会话：代理保留客户端发来的消息，以便于消息订阅端上线立刻获取消息
+
+固定报头格式 ： Fixed herder
+
+工作原理：
+消息发布者 -> 向Broker发布消息 -> MQTT服务器Broker  <- 消息订阅  <- 消息订阅者1
+
+EMQX：
+下载解压后
+以管理员身份切换到bin目录下 cd /d D:\kits\MQTT\emqx\bin
+执行EMQX安装命令 emqx.cmd install 
+emqx.cmd uninstall 卸载命令 
+
+EMQX_NODE__DB_ROLE [node.role]: core
+EMQX_NODE__DB_BACKEND [node.db_backend]: mnesia
+D:\kits\MQTT\emqx\erts-13.2.2.4\bin\erlsrv.exe: Service emqx_5.3.2 added to system.
+[SC] ChangeServiceConfig 成功
+
+显示上述信息，则安装成功
+
+点击计算机管理，服务中，启动emqx服务
+
+命令行输入 emqx.cmd console  启动emqx 的监控
+
+EMQX_LOG__CONSOLE_HANDLER__ENABLE [log.console.enable]: true
+EMQX_NODE__DB_ROLE [node.role]: core
+EMQX_NODE__DB_BACKEND [node.db_backend]: mnesia
+
+D:\kits\MQTT\emqx>D:\kits\MQTT\emqx\erts-13.2.2.4\bin\erl.exe -mode embedded -boot "D:\kits\MQTT\emqx\releases\5.3.2\start" -config "D:\kits\MQTT\emqx\data\configs\app.2026.08.07.14.23.37.config" -args_file "D:\kits\MQTT\emqx\data\configs\vm.2026.08.07.14.23.37.args" -mnesia dir 'd:/kits/MQTT/emqx/data/mnesia/emqx@127.0.0.1'
+Listener ssl:default on 0.0.0.0:8883 started.
+Listener tcp:default on 0.0.0.0:1883 started.
+Listener ws:default on 0.0.0.0:8083 started.
+Listener wss:default on 0.0.0.0:8084 started.
+Listener http:dashboard on :18083 started.
+EMQX 5.3.2 is running now!
+Eshell V13.2.2.4  (abort with ^G)
+v5.3.2(emqx@127.0.0.1)1>
+当提示以上信息，则表示启动成功
+
+浏览器访问 http://localhost:18083 能打开 Dashboard 登录页面。
+默认初始化用户名 admin 默认密码 pubic
+
+在正式环境中，对环境启动时直接在bin目录下输入 emqx start 进行EMQX 启动，
+
+下载MQTTX代理服务器的客户端  https://mqttx.app/zh/downloads
+
+本地机器ip  127.0.0.1
+确定Clientid
+选择要对话的主题 
+
+package com.zpark.mqtt_demo.config;
+
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.core.MessageProducer;
+import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
+import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
+import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
+import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageHandler;
+
+@Configuration
+public class MqttConfig {
+
+    @Value("${mqtt.url}")
+    private String url;
+
+    @Value("${mqtt.clientId}")
+    private String clientId;
+
+    @Value("${mqtt.topic}")
+    private String topic;
+
+    @Bean
+    public MqttConnectOptions mqttConnectOptions() {
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setServerURIs(new String[]{url});
+        options.setCleanSession(true);
+        return options;
+    }
+
+    @Bean
+    public MqttPahoClientFactory mqttClientFactory() {
+        DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
+        factory.setConnectionOptions(mqttConnectOptions());
+        return factory;
+    }
+
+    // 接收消息的通道
+    @Bean
+    public MessageChannel mqttInputChannel() {
+        return new DirectChannel();
+    }
+
+    // 配置入站适配器（订阅消息）
+    @Bean
+    public MessageProducer inbound() {
+        MqttPahoMessageDrivenChannelAdapter adapter =
+                new MqttPahoMessageDrivenChannelAdapter(clientId + "-in", mqttClientFactory(), topic);
+        adapter.setCompletionTimeout(5000);
+        adapter.setQos(1);
+        adapter.setOutputChannel(mqttInputChannel());
+        return adapter;
+    }
+
+    // 发送消息的通道
+    @Bean
+    public MessageChannel mqttOutboundChannel() {
+        return new DirectChannel();
+    }
+
+    // 配置出站适配器（发送消息）
+    @Bean
+    @ServiceActivator(inputChannel = "mqttOutboundChannel")
+    public MessageHandler mqttOutbound() {
+        MqttPahoMessageHandler handler = new MqttPahoMessageHandler(clientId + "-out", mqttClientFactory());
+        handler.setAsync(true);
+        handler.setDefaultTopic(topic);
+        return handler;
+    }
+}
+
+
+
+
+
+
+
+package com.zpark.mqtt_demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class TestController {
+
+    @Autowired
+    private MessageChannel mqttOutboundChannel;
+
+    @GetMapping("/publish")
+    public String publish(@RequestParam("msg") String msg) {
+        mqttOutboundChannel.send(MessageBuilder.withPayload(msg).build());
+        return "消息已发送: " + msg;
+    }
+}
+
+
+
+
+
+
+package com.zpark.mqtt_demo.handler;
+
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MqttMessageHandler {
+
+    @ServiceActivator(inputChannel = "mqttInputChannel")
+    public void handleMessage(String payload) {
+        System.out.println("✅ 收到消息: " + payload);
+        // 在这里编写你的业务逻辑，比如保存到数据库、转发等
+    }
+}
+
+package com.zpark.mqtt_demo01;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.integration.config.EnableIntegration;
+
+@SpringBootApplication
+@EnableIntegration  
+public class MqttDemo01Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MqttDemo01Application.class, args);
+    }
+
+}
+
+但在实际复杂项目中，显式添加 @EnableIntegration 是一个极其安全且推荐的做法。
+它能保证 Spring Integration 的注解驱动功能在任何环境下都百分之百生效，避免依赖于自动配置的隐式条件。

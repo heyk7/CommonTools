@@ -1,0 +1,27 @@
+# 安装包 / 镜像文件（体积大，GitHub 单文件上限 100MB）
+*.msi
+*.iso
+*.zip
+*.rar
+*.7z
+*.dmg
+*.exe
+
+# 保留便携版工具目录内的可执行文件（Bandizip 绿色版）
+!Bandizip/*.exe
+!Bandizip/data/*.exe
+
+# Nacos 运行时数据、日志及超限 jar 包
+nacos/nacos/target/
+nacos/nacos/data/
+nacos/nacos/logs/
+nacos/nacos/bin/logs/
+nacos/nacos/bin/work/
+nacos/nacos/bin/derby.log
+
+# 激活/破解相关配置
+Datagrip/Datagrip破解配置说明/
+
+# 系统文件
+Thumbs.db
+desktop.ini

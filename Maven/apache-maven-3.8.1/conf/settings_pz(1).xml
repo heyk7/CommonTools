@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <!-- 本地仓库路径 -->
+    <localRepository>D:\Maven1\apache-maven-3.8.1\repo</localRepository>
+
+    <!-- 镜像配置 -->
+   <mirrors>
+   
+        <mirror>
+            <id>private-nexus</id>
+            <mirrorOf>*</mirrorOf>
+            <name>Private Nexus Repository</name>
+            <url>http://10.1.207.158:38081/repository/maven-public/</url>
+            <blocked>false</blocked>
+        </mirror>
+    </mirrors>
+
+    <!-- 服务器认证 -->
+    <servers>
+        <server>
+            <id>release</id>
+            <username>admin</username>
+            <password>admin@123_</password>
+        </server>
+        <server>
+            <id>snapshot</id>
+            <username>admin</username>
+            <password>admin@123_</password>
+        </server>
+        <server>
+            <id>nexus-ai</id>
+            <username>admin</username>
+            <password>admin@123_</password>
+        </server>
+        <server>
+            <id>nexus-prd</id>
+            <username>admin</username>
+            <password>admin@123_</password>
+        </server>
+        <server>
+            <id>central</id>
+            <username>admin</username>
+            <password>admin@123_</password>
+        </server>
+    </servers>
+
+    <!-- Profile 配置 -->
+    <profiles>
+        <profile>
+            <id>nexus</id>
+            <repositories>
+                <repository>
+                    <id>nexus</id>
+                    <name>local private nexus</name>
+                    <url>http://10.1.207.158:38081/repository/maven-public/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>nexus</id>
+                    <name>local private nexus</name>
+                    <url>http://10.1.207.158:38081/repository/maven-public/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+
+    <!-- 激活 profile -->
+    <activeProfiles>
+        <activeProfile>nexus</activeProfile>
+    </activeProfiles>
+
+</settings>
