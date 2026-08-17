@@ -11,6 +11,9 @@
 !Bandizip/*.exe
 !Bandizip/data/*.exe
 
+# Git 安装包（<100MB，直接上传）
+!Git/*.exe
+
 # 分卷压缩包目录（.z01 等分卷不受 *.zip 影响，但每组末尾的 .zip 需要放行）
 !archives/*.zip
 

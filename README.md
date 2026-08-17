@@ -14,6 +14,7 @@
 |------|------|------|
 | [apache-tomcat-10.1.20](apache-tomcat-10.1.20/) | 10.1.20 | Java Web 应用服务器（免安装版） |
 | [Bandizip](Bandizip/) | 7.29 | 压缩/解压软件（绿色便携版） |
+| [Git](Git/) | 2.43.0 | Git 版本控制工具（Windows 安装包 + 安装使用手册 PDF） |
 | [Maven](Maven/) | 3.3.9 / 3.8.1 / 3.8.4 / 3.9.4 | Java 项目构建与依赖管理（含本地仓库 myrepo） |
 | [nacos](nacos/nacos/) | 2.5.2 | 阿里微服务注册/配置中心（已解压目录，仅含配置与启动脚本） |
 | [MQTT](MQTT/) | - | MQTT 协议学习笔记（`MQTT协议.txt`） |
